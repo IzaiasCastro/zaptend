@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConfirmarAgendamentoController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -31,5 +32,9 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+
+Route::get('/confirmar-agendamento', [ConfirmarAgendamentoController::class, 'show'])->name('confirmar.agendamento');
+Route::post('/confirmar-agendamento', [ConfirmarAgendamentoController::class, 'confirmar'])->name('confirmar.agendamento.confirmar');
+
 
 require __DIR__.'/auth.php';

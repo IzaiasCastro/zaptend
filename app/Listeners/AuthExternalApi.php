@@ -18,9 +18,6 @@ class AuthExternalApi
     public function handle(Login $event): void
     {
         try {
-            // Apenas pega o token (API Key) do service
-            $token = $this->api->listModels();
-
             Log::info('Usuário logado: ' . $event->user->email);
             
             // Se quiser, você pode testar a API, por exemplo, listar modelos

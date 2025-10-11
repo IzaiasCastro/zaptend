@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Agendamento;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -32,53 +34,167 @@ class ExternalApiService
     /**
      * Faz uma requisição GET à OpenAI (exemplo: listar modelos)
      */
-    public function listModels()
-    {
-        $response = Http::withHeaders($this->getHeaders())
-            ->get('https://api.openai.com/v1/models');
 
-        if ($response->successful()) {
-            Log::info('Resposta da API GPT: ' . $response->body());
-            return $response->json();
-        }
-
-        throw new \Exception('Erro ao listar modelos: ' . $response->body());
-    }
-    public function updateAssistent($data)
+    public function updateAssistent($horario, $diaSemana = null)
     {
-        $messages = [
-            ['role' => 'user', 'content' => 'voce nao pode marcar horario no sabado, pois nao estara disponivel']
+
+        // prompt
+
+        // Mapear números do PHP para nomes dos dias
+        $diasSemana = [
+            0 => 'domingo',
+            1 => 'segunda',
+            2 => 'terça',
+            3 => 'quarta',
+            4 => 'quinta',
+            5 => 'sexta',
+            6 => 'sábado',
         ];
-        $this->sendThreadMessages($messages);
-    }
 
-    public function sendThreadMessages(array $messages)
-    {
+        // Dia atual
+        $hoje = $diasSemana[date('w')];
 
-         $result =[
-        'instructions' => 'a pousada é fechada aos sabados'
-    ];
+        // Gerar datas correspondentes aos próximos dias da semana
+        $datasSemana = [];
+        $datasSemanaOcupados = [];
+        // for ($i = 0; $i < 7; $i++) {
+        //     $datasSemana[$diasSemana[$i]] = Carbon::now()->startOfWeek()->addDays($i)->format('Y-m-d');
+        //     // dd($datasSemana[$diasSemana[$i]]);
+        //     //consultar agendamentos pra cada data
+        //     $datasSemanaOcupados[$diasSemana[$i]] = Agendamento::where('data', $datasSemana[$diasSemana[$i]])
+        //     ->where('profissional_id', $horario->profissional_id)->get()->pluck('horario');
+            
+        // }
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Content-Type' => 'application/json',
-            'OpenAI-Beta' => 'assistants=v2'
-        ])->post("https://api.openai.com/v1/assistants/{$this->assistant_id}", $result);
+        for ($i = 0; $i < 7; $i++) {
+            // Se hoje for domingo, começa a contagem hoje
+            if (Carbon::now()->isSunday()) {
+                $dataBase = Carbon::now()->startOfWeek(Carbon::SUNDAY);
+            } else {
+                // Caso contrário, começa no PRÓXIMO domingo
+                $dataBase = Carbon::now()->next(Carbon::SUNDAY);
+            }
 
-        if ($response->successful()) {
-            Log::info('Resposta da API GPT: ' . $response->body());
-            return $response->json();
+            $datasSemana[$diasSemana[$i]] = $dataBase
+                ->copy()
+                ->addDays($i)
+                ->format('Y-m-d');
+
+            // Consulta agendamentos desse dia
+            $datasSemanaOcupados[$diasSemana[$i]] = Agendamento::where('data', $datasSemana[$diasSemana[$i]])
+                ->where('profissional_id', $horario->profissional_id)
+                ->pluck('horario');
         }
 
-        throw new \Exception('Erro ao modificar assistente: ' . $response->body());
 
+       $prompt = <<<EOT
+                        Você é um assistente virtual especializado em organizar agendas de profissionais.
+
+                        Profissional: **{$horario->profissional->nome}**
+
+                        ---
+
+                        ### 🕒 Horários disponíveis:
+
+                        - Domingo ({$datasSemana['domingo']}): {$horario->domingo}
+                        - Segunda ({$datasSemana['segunda']}): {$horario->segunda}
+                        - Terça ({$datasSemana['terça']}): {$horario->terca}
+                        - Quarta ({$datasSemana['quarta']}): {$horario->quarta}
+                        - Quinta ({$datasSemana['quinta']}): {$horario->quinta}
+                        - Sexta ({$datasSemana['sexta']}): {$horario->sexta}
+                        - Sábado ({$datasSemana['sábado']}): {$horario->sabado}
+
+
+                        ---
+
+                        ### 🚫 Horários ocupados (não disponíveis):
+
+                        - Domingo ({$datasSemanaOcupados['domingo']})
+                        - Segunda ({$datasSemanaOcupados['segunda']})
+                        - Terça ({$datasSemanaOcupados['terça']})
+                        - Quarta ({$datasSemanaOcupados['quarta']})
+                        - Quinta ({$datasSemanaOcupados['quinta']})
+                        - Sexta ({$datasSemanaOcupados['sexta']})
+                        - Sábado ({$datasSemanaOcupados['sábado']})
+
+                        Esses horários **não podem ser agendados**.  
+                        Nunca confirme nem ofereça nenhum desses horários.
+
+                        Todos os outros horários listados acima **estão disponíveis** para agendamento.
+
+                        ---
+
+                        ### 🧠 Regras de interpretação de datas:
+                        - Quando o cliente disser um dia da semana (ex: "terça", "sexta"), associe à **data correta da semana atual**.
+                        - Se disser "amanhã" ou "depois de amanhã", **calcule automaticamente** a data correspondente.
+
+                        ---
+
+                        ### 📅 Ao receber um pedido de agendamento:
+
+                        1. Identifique o **dia e a data exata**.
+                        2. Verifique se o **horário pedido está disponível**.
+                        3. Se estiver disponível, **confirme de forma amigável** e envie o link de confirmação:
+                        {$horario->link}?profissional={urlencode($horario->profissional->nome)}&data={DATA_ENCONTRADA}&horario={HORARIO_PEDIDO}
+
+                        4. Se **não estiver disponível**, avise gentilmente e **sugira até 3 horários alternativos**.
+
+                        ---
+
+                        ### ⚠️ IMPORTANTE:
+                        - **Você deve SEMPRE incluir o link de confirmação** em sua resposta, mesmo quando estiver apenas sugerindo horários alternativos.
+                        - **Sem o link, o agendamento não será confirmado.**
+                        - Mantenha sempre um **tom profissional, empático e acolhedor**.
+
+                        EOT;
+
+                Log::info($prompt);
+
+                //
+
+                $result = [
+                    'instructions' => $prompt
+                ];
+
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                    'OpenAI-Beta' => 'assistants=v2'
+                ])->post("https://api.openai.com/v1/assistants/{$this->assistant_id}", $result);
+
+                if ($response->successful()) {
+                    Log::info('Resposta da API GPT: ' . $response->body());
+                    return $response->json();
+                }
+
+                throw new \Exception('Erro ao modificar assistente: ' . $response->body());
     }
 
-    /**
-     * Retorna o token (no caso, a API key) - usando cache se quiser
-     */
-    public function getToken()
-    {
-        return Cache::remember('gpt_api_key', 60 * 60, fn() => $this->apiKey);
+    public function complement() {
+             $response = Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+            ])->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-5',
+                'messages' => [
+                    [
+                        'role' => 'developer',
+                        'content' => 'You are a helpful assistant.',
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => 'Hello!',
+                    ],
+                ],
+            ]);
+
+            // Exibir ou tratar resposta
+            if ($response->successful()) {
+                $data = $response->json();
+                dd($data['choices'][0]['message']['content']);
+            } else {
+                dd('Erro: ' . $response->body());
+            }
     }
+   
 }

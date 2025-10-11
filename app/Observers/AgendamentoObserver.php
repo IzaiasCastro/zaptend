@@ -52,6 +52,7 @@ class AgendamentoObserver
         ]);
 
 // Atualizar assistente
-        $this->api->updateAssistent($horario);
+$this->api->updateAssistant($horario);
+        // $this->api->updateAssistent($horario);
     }
 }

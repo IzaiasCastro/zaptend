@@ -5,54 +5,109 @@ namespace App\Filament\Resources\Agendamentos\Schemas;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TimePicker;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use App\Models\Cliente;
+use App\Models\Profissional;
+use App\Models\Servico;
 
 class AgendamentoForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                DatePicker::make('data')
-                    ->required(),
-                TimePicker::make('horario')
-                    ->required(),
-                TextInput::make('nome')
-                    ->required(),
-                TextInput::make('telefone')
-                    ->tel()
-                    ->required(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email()
-                    ->required(),
-                TextInput::make('servico')
-                    ->required(),
-                TextInput::make('observacao'),
-                TextInput::make('profissional_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('servico_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('agenda_id')
-                    ->required()
-                    ->numeric(),
-                Select::make('status')
-                    ->options(['pendente' => 'Pendente', 'confirmado' => 'Confirmado', 'cancelado' => 'Cancelado'])
-                    ->default('pendente')
-                    ->required(),
-                Select::make('pagamento')
-                    ->options(['pendente' => 'Pendente', 'pago' => 'Pago'])
-                    ->default('pendente')
-                    ->required(),
-                TextInput::make('valor')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('metodo_pagamento'),
-                TextInput::make('cliente_id')
-                    ->numeric(),
-            ]);
+        return $schema->components([
+
+            // Seção: Dados do Agendamento
+            Section::make('Dados do Agendamento')
+                ->schema([
+                    DatePicker::make('data')
+                        ->label('Data')
+                        ->required(),
+
+                    TimePicker::make('horario')
+                        ->label('Horário')
+                        ->required(),
+
+                    Textarea::make('observacao')
+                        ->label('Observações')
+                        ->placeholder('Informações adicionais sobre o atendimento')
+                        ->rows(3)
+                        ->columnSpanFull()
+                        ->nullable(),
+                ]),
+
+            // Seção: Cliente
+            Section::make('Cliente')
+                ->schema([
+                    Select::make('cliente_id')
+                        ->label('Cliente')
+                        ->options(Cliente::pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->required(),
+
+                    TextInput::make('telefone')
+                        ->label('Telefone')
+                        ->tel()
+                        // ->mask(fn ($mask) => $mask->pattern('(00) 00000-0000'))
+                        ->required(),
+
+                    TextInput::make('email')
+                        ->label('E-mail')
+                        ->email()
+                        ->required(),
+                ]),
+
+            // Seção: Profissional e Serviço
+            Section::make('Profissional e Serviço')
+                ->schema([
+                    Select::make('profissional_id')
+                        ->label('Profissional')
+                        ->options(Profissional::pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->required(),
+
+                    Select::make('servico_id')
+                        ->label('Serviço')
+                        ->options(Servico::pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->required(),
+
+                    TextInput::make('valor')
+                        ->label('Valor')
+                        ->numeric()
+                        ->required()
+                        ->helperText('Informe o valor do serviço em R$.'),
+                ]),
+
+            // Seção: Pagamento e Status
+            Section::make('Pagamento e Status')
+                ->schema([
+                    Select::make('status')
+                        ->label('Status do Agendamento')
+                        ->options([
+                            'pendente' => 'Pendente',
+                            'confirmado' => 'Confirmado',
+                            'cancelado' => 'Cancelado',
+                        ])
+                        ->default('pendente')
+                        ->required(),
+
+                    Select::make('pagamento')
+                        ->label('Status do Pagamento')
+                        ->options([
+                            'pendente' => 'Pendente',
+                            'pago' => 'Pago',
+                        ])
+                        ->default('pendente')
+                        ->required(),
+
+                    TextInput::make('metodo_pagamento')
+                        ->label('Método de Pagamento')
+                        ->placeholder('Ex: Dinheiro, Pix, Cartão')
+                        ->nullable(),
+                ]),
+        ]);
     }
 }

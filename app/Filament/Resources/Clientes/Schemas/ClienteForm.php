@@ -3,29 +3,98 @@
 namespace App\Filament\Resources\Clientes\Schemas;
 
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 
 class ClienteForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('nome')
-                    ->required(),
-                TextInput::make('telefone')
-                    ->tel(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email(),
-                TextInput::make('cpf'),
-                TextInput::make('cep'),
-                TextInput::make('logradouro'),
-                TextInput::make('bairro'),
-                TextInput::make('cidade'),
-                TextInput::make('estado'),
-                TextInput::make('complemento'),
-                TextInput::make('numero'),
-            ]);
+        return $schema->components([
+
+            // Seção: Informações Pessoais
+            Section::make('Informações Pessoais')
+                ->schema([
+                    TextInput::make('nome')
+                        ->label('Nome completo')
+                        ->placeholder('Digite o nome do cliente')
+                        ->required(),
+
+                    TextInput::make('cpf')
+                        ->label('CPF')
+                        ->placeholder('000.000.000-00')
+                        // ->mask(fn ($mask) => $mask->pattern('000.000.000-00'))
+                        ->required(),
+                ]),
+
+            // Seção: Contato
+            Section::make('Contato')
+                ->schema([
+                    TextInput::make('telefone')
+                        ->label('Telefone')
+                        ->tel()
+                        ->placeholder('(99) 99999-9999')
+                        // ->mask(fn ($mask) => $mask->pattern('(00) 00000-0000'))
+                        ->required(),
+
+                    TextInput::make('email')
+                        ->label('E-mail')
+                        ->placeholder('exemplo@dominio.com')
+                        ->email()
+                        ->required(),
+                ]),
+
+            // Seção: Endereço
+            Section::make('Endereço')
+                ->schema([
+                    TextInput::make('cep')
+                        ->label('CEP')
+                        ->placeholder('00000-000')
+                        // ->mask(fn ($mask) => $mask->pattern('00000-000'))
+                        ->required(),
+
+                    TextInput::make('logradouro')
+                        ->label('Logradouro')
+                        ->placeholder('Rua, Avenida, etc.')
+                        ->required(),
+
+                    TextInput::make('numero')
+                        ->label('Número')
+                        ->placeholder('Número do endereço')
+                        ->required(),
+
+                    TextInput::make('complemento')
+                        ->label('Complemento')
+                        ->placeholder('Apartamento, bloco, etc.')
+                        ->nullable(),
+
+                    TextInput::make('bairro')
+                        ->label('Bairro')
+                        ->required(),
+
+                    TextInput::make('cidade')
+                        ->label('Cidade')
+                        ->required(),
+
+                    TextInput::make('estado')
+                        ->label('Estado')
+                        ->placeholder('Ex: SP, RJ')
+                        ->required(),
+                ]),
+
+            // Seção: Foto do Cliente (opcional)
+            Section::make('Foto do Cliente')
+                ->schema([
+                    FileUpload::make('imagem')
+                        ->label('Foto do Cliente')
+                        ->image()
+                        ->directory('clientes')
+                        ->maxSize(2048)
+                        ->helperText('Envie uma foto clara do cliente.')
+                        ->nullable(),
+                ]),
+        ]);
     }
 }

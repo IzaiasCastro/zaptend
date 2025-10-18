@@ -81,6 +81,22 @@ Route::get('/agendas', function (Request $request) {
 
         $diaPortugues = $diasSemana[$diaIngles] ?? $diaIngles;
 
+        //dias da semana pre calculados
+
+        $hoje = Carbon::now();
+        $referencia_semanal = [
+            'data_hoje' => $hoje->format('Y-m-d'),
+            'dia_semana_hoje' => $hoje->translatedFormat('l'),
+            'amanha' => $hoje->copy()->addDay()->format('Y-m-d'),
+            'segunda' => $hoje->copy()->next(Carbon::MONDAY)->format('Y-m-d'),
+            'terca' => $hoje->copy()->next(Carbon::TUESDAY)->format('Y-m-d'),
+            'quarta' => $hoje->copy()->next(Carbon::WEDNESDAY)->format('Y-m-d'),
+            'quinta' => $hoje->copy()->next(Carbon::THURSDAY)->format('Y-m-d'),
+            'sexta' => $hoje->copy()->next(Carbon::FRIDAY)->format('Y-m-d'),
+            'sabado' => $hoje->copy()->next(Carbon::SATURDAY)->format('Y-m-d'),
+            'domingo' => $hoje->copy()->next(Carbon::SUNDAY)->format('Y-m-d'),
+        ];
+
         return [
             'profissional' => $profissional->nome,
             'disponivel' => $disponivel,
@@ -92,6 +108,7 @@ Route::get('/agendas', function (Request $request) {
             'tempo_medio' => $disponivel ? $agenda->tempo_medio : null,
             'dias_de_trabalho' => $dias_de_trabalho,
             'dia_da_semana_atual' => $diaPortugues,
+            'referencia_semanal' => $referencia_semanal,
         ];
     });
 

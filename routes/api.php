@@ -11,7 +11,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/agendas/{data}', function (Request $request, $data) {
+Route::get('/agendas', function (Request $request) {
+    if ($request['data']) {
     // Converte a string da URL para Carbon
     $data = Carbon::parse($data)->format('Y-m-d');
 
@@ -56,4 +57,10 @@ Route::get('/agendas/{data}', function (Request $request, $data) {
             'agendamentos_confirmados' => $agendamentosConfirmados,
         ],
     ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Antes de tudo pergunte a data que o cliente deseja fazer o agendamento.',
+        ], 400);
+    }
 });

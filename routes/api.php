@@ -12,9 +12,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/agendas', function (Request $request) {
-    if ($request['data']) {
-    // Converte a string da URL para Carbon
-    $data = Carbon::parse($request['data'])->format('Y-m-d');
 
     // JSON com agendas dos profissionais
     $profissionais = Profissional::with('agenda')->get();
@@ -37,8 +34,8 @@ Route::get('/agendas', function (Request $request) {
         ];
     });
 
-    // JSON com agendamentos confirmados na data
-    $agendamentosConfirmados = Agendamento::whereDate('data', $data)
+    // JSON com agendamentos confirmados  na data maior ou igual a hoje
+    $agendamentosConfirmados = Agendamento::whereBetween('data', [Carbon::now()->format('Y-m-d'), Carbon::now()->addWeek()->format('Y-m-d')])
         ->get()
         ->map(function($agendamento) {
             return [
@@ -57,10 +54,4 @@ Route::get('/agendas', function (Request $request) {
             'agendamentos_confirmados' => $agendamentosConfirmados,
         ],
     ]);
-    } else {
-        return response()->json([
-            'success' => false,
-            'message' => 'Antes de tudo pergunte a data que o cliente deseja fazer o agendamento.',
-        ], 400);
-    }
 });

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Agendamento;
+use App\Models\Cliente;
 use App\Models\Profissional;
 use App\Models\Servico;
 use Carbon\Carbon;
@@ -65,5 +66,27 @@ Route::get('/agendas', function (Request $request) {
             })
             ,
         ],
+    ]);
+});
+
+Route::post('/agendamento', function (Request $request) {
+    //remover hora e criar somente a data
+    $dataInicio = Carbon::parse($request->input('data_inicio'))->format('Y-m-d');
+
+    //remover data e criar somente a hora
+    $horario = Carbon::parse($request->input('data_inicio'))->format('H:i');
+
+    $dadosFormatados = [
+        'profissional_id' => Profissional::where('nome', 'like', $request->input('profissional'))->first()->id,
+        'cliente_id' => Cliente::where('nome', 'like', $request->input('cliente'))->first()->id,
+        'servico_id' => Servico::where('nome', 'like', $request->input('servico'))->first()->id,
+        'data' => $dataInicio,
+        'horario' => $horario,
+        'status' => 'confirmado',
+    ];
+    $agendamento = Agendamento::create($dadosFormatados);
+    return response()->json([
+        'success' => true,
+        'data' => $agendamento,
     ]);
 });

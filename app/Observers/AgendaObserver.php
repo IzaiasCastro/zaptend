@@ -29,7 +29,6 @@ class AgendaObserver
     public function updated(Agenda $agenda): void
     {
         Log::info('Agenda atualizada: ' . $agenda->id);
-        $this->api->updateAssistent($agenda);
     }
 
     /**

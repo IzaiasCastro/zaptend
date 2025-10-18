@@ -23,7 +23,7 @@ class ProfissionalForm
                 ]),
 
             // Seção: Contato
-            Section::make('Contato')
+            Section::make('Contato WhatsApp')
                 ->schema([
                     TextInput::make('telefone')
                         ->label('Telefone')
@@ -35,8 +35,7 @@ class ProfissionalForm
                     TextInput::make('email')
                         ->label('E-mail')
                         ->placeholder('exemplo@dominio.com')
-                        ->email()
-                        ->required(),
+                        ->email(),
                 ]),
 
             // Seção: Endereço
@@ -44,19 +43,16 @@ class ProfissionalForm
                 ->schema([
                     TextInput::make('cep')
                         ->label('CEP')
-                        ->placeholder('00000-000')
-                        // ->mask(fn ($mask) => $mask->pattern('00000-000'))
-                        ->required(),
+                        ->placeholder('00000-000'),
+                        // ->mask(fn ($mask) => $mask->pattern('00000-000')),
 
                     TextInput::make('logradouro')
                         ->label('Logradouro')
-                        ->placeholder('Rua, Avenida, etc.')
-                        ->required(),
+                        ->placeholder('Rua, Avenida, etc.'),
 
                     TextInput::make('numero')
                         ->label('Número')
-                        ->placeholder('Número do endereço')
-                        ->required(),
+                        ->placeholder('Número do endereço'),
 
                     TextInput::make('complemento')
                         ->label('Complemento')
@@ -64,17 +60,14 @@ class ProfissionalForm
                         ->nullable(),
 
                     TextInput::make('bairro')
-                        ->label('Bairro')
-                        ->required(),
+                        ->label('Bairro'),
 
                     TextInput::make('cidade')
-                        ->label('Cidade')
-                        ->required(),
+                        ->label('Cidade'),
 
                     TextInput::make('estado')
                         ->label('Estado')
-                        ->placeholder('Ex: SP, RJ')
-                        ->required(),
+                        ->placeholder('Ex: SP, RJ'),
                 ]),
 
             // Seção: Imagem do Perfil
@@ -85,7 +78,6 @@ class ProfissionalForm
                         ->image()
                         ->directory('profissionais')
                         ->maxSize(2048) // 2MB
-                        ->required()
                         ->helperText('Envie uma foto clara e de boa qualidade.'),
                 ]),
         

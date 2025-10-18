@@ -57,13 +57,11 @@ class ClienteForm
 
                     TextInput::make('logradouro')
                         ->label('Logradouro')
-                        ->placeholder('Rua, Avenida, etc.')
-                        ->required(),
+                        ->placeholder('Rua, Avenida, etc.'),
 
                     TextInput::make('numero')
                         ->label('Número')
-                        ->placeholder('Número do endereço')
-                        ->required(),
+                        ->placeholder('Número do endereço'),
 
                     TextInput::make('complemento')
                         ->label('Complemento')
@@ -71,30 +69,17 @@ class ClienteForm
                         ->nullable(),
 
                     TextInput::make('bairro')
-                        ->label('Bairro')
-                        ->required(),
+                        ->label('Bairro'),
 
                     TextInput::make('cidade')
-                        ->label('Cidade')
-                        ->required(),
+                        ->label('Cidade'),
 
                     TextInput::make('estado')
                         ->label('Estado')
-                        ->placeholder('Ex: SP, RJ')
-                        ->required(),
+                        ->placeholder('Ex: SP, RJ'),
                 ]),
 
-            // Seção: Foto do Cliente (opcional)
-            Section::make('Foto do Cliente')
-                ->schema([
-                    FileUpload::make('imagem')
-                        ->label('Foto do Cliente')
-                        ->image()
-                        ->directory('clientes')
-                        ->maxSize(2048)
-                        ->helperText('Envie uma foto clara do cliente.')
-                        ->nullable(),
-                ]),
+            
         ]);
     }
 }

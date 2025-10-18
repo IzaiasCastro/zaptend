@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Agendas\Schemas;
 
+use App\Models\Profissional;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
@@ -22,7 +23,7 @@ class AgendaForm
                 ->schema([
                     Select::make('profissional_id')
                         ->label('Profissional')
-                        // ->options(User::where('tipo', 'profissional')->pluck('name', 'id')->toArray())
+                        ->options(Profissional::pluck('nome', 'id')->toArray())
                         ->searchable()
                         ->placeholder('Selecione o profissional responsável')
                         ->required()
@@ -90,6 +91,23 @@ class AgendaForm
                                 ->label('Domingo'),
                         ])
                 ]),
+
+             Section::make('Disponível')
+                ->description('Defina o status da agenda.')
+                ->schema([
+                    Grid::make()
+                        ->columns([
+                            '@md' => 3,
+                            '@xl' => 4,
+                        ])
+                        ->schema([
+                            Toggle::make('status')
+                                ->label('Disponível'),
+                            
+                        ])
+                ]),
+
+            
         ]);
     }
 }

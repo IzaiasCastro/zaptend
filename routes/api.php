@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 //criar cliente via whatsapp
-Route::get('/criar-cliente', function (Request $request) {
+Route::post('/criar-cliente', function (Request $request) {
     $dados = [
         'nome' => $request->input('nome'),
         'telefone' => $request->input('telefone'),

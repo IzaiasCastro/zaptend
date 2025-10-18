@@ -14,6 +14,20 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+//criar cliente via whatsapp
+Route::get('/criar-cliente', function (Request $request) {
+    $dados = [
+        'nome' => $request->input('nome'),
+        'telefone' => $request->input('telefone'),
+    ];
+    $cliente = Cliente::create($dados);
+    return response()->json([
+        'success' => true,
+        'data' => $cliente,
+    ]);
+});
+
+
 //buscar cliente pelo whatsapp
 Route::get('/buscar-cliente', function (Request $request) {
     $cliente = Cliente::where('telefone', 'like', $request->input('whatsapp'))->first();

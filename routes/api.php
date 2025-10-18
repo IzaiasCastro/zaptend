@@ -52,6 +52,7 @@ Route::get('/agendas', function (Request $request) {
         'data' => [
             'profissionais' => $jsonAgendas,
             'agendamentos_confirmados' => $agendamentosConfirmados,
+            'data_hoje' => Carbon::now()->format('Y-m-d'),
         ],
     ]);
 });

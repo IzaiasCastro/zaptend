@@ -14,6 +14,22 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+//buscar cliente pelo whatsapp
+Route::get('/buscar-cliente', function (Request $request) {
+    $cliente = Cliente::where('telefone', 'like', $request->input('whatsapp'))->first();
+    if( !$cliente ) {
+        Log::error('Cliente nao encontrado pelo whatsapp: ' . $request->input('whatsapp'));
+        return response()->json([
+            'success' => false,
+            'message' => 'Cliente nao encontrado',
+        ], 404);
+    }
+    return response()->json([
+        'success' => true,
+        'data' => $cliente,
+    ]);
+});
+
 Route::get('/agendas', function (Request $request) {
 
     // JSON com agendas dos profissionais

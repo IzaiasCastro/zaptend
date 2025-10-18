@@ -58,13 +58,15 @@ Route::get('/agendas', function (Request $request) {
         $dias_de_trabalho = [];
 
         if( $disponivel && $agenda ) {
-            $dias_de_trabalho = ['segunda' => $agenda->segunda ? 'disponivel' : 'nao disponivel',
+            $dias_de_trabalho = [
+                'domingo' => $agenda->domingo ? 'disponivel' : 'nao disponivel',
+                'segunda' => $agenda->segunda ? 'disponivel' : 'nao disponivel',
                 'terca' => $agenda->terca ? 'disponivel' : 'nao disponivel',
                 'quarta' => $agenda->quarta ? 'disponivel' : 'nao disponivel',
                 'quinta' => $agenda->quinta ? 'disponivel' : 'nao disponivel',
                 'sexta' => $agenda->sexta ? 'disponivel' : 'nao disponivel',
                 'sabado' => $agenda->sabado ? 'disponivel' : 'nao disponivel',
-                'domingo' => $agenda->domingo ? 'disponivel' : 'nao disponivel'];
+                ];
         }
 
         $diaIngles = Carbon::now()->format('l');

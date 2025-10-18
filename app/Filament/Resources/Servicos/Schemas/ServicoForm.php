@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Servicos\Schemas;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -51,6 +52,14 @@ class ServicoForm
                         ->maxSize(2048) // 2MB
                         ->helperText('Envie uma imagem clara e representativa do serviço.')
                         ->nullable(),
+                ]),
+            // Seção: Imagem do Serviço
+            Section::make('Disponibilidade do Serviço')
+                ->schema([
+                    Toggle::make('status')
+                        ->label('Serviço Ativo')
+                        ->default(true)
+                        ->helperText('Ative ou desative a disponibilidade deste serviço para agendamentos.'),
                 ]),
         ]);
     }

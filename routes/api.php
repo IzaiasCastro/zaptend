@@ -3,6 +3,7 @@
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Agendamento;
 use App\Models\Profissional;
+use App\Models\Servico;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,7 @@ Route::get('/agendas', function (Request $request) {
             'profissionais' => $jsonAgendas,
             'agendamentos_confirmados' => $agendamentosConfirmados,
             'data_hoje' => Carbon::now()->format('Y-m-d'),
+            'servicos_disponiveis' => Servico::where('status', true)->get(),
         ],
     ]);
 });

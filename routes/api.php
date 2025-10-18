@@ -7,6 +7,7 @@ use App\Models\Profissional;
 use App\Models\Servico;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
@@ -76,14 +77,57 @@ Route::post('/agendamento', function (Request $request) {
     //remover data e criar somente a hora
     $horario = Carbon::parse($request->input('data_inicio'))->format('H:i');
 
+    $profissional = Profissional::where('nome', 'like', $request->input('profissional'))->first();
+    if( !$profissional ) {
+        Log::error('Profissional não encontrado: ' . $request->input('profissional'));
+        return response()->json([
+            'success' => false,
+            'message' => 'Profissional não encontrado',
+        ], 404);
+    }
+
+    //cliente
+    $cliente = Cliente::where('nome', 'like', $request->input('cliente'))->first();
+    if( !$cliente ) {
+        Log::error('Cliente nao encontrado: ' . $request->input('cliente'));
+        return response()->json([
+            'success' => false,
+            'message' => 'Cliente nao encontrado',
+        ], 404);
+    }
+
+    //servico
+    $servico = Servico::where('nome', 'like', $request->input('servico'))->first();
+    if( !$servico ) {
+        Log::error('Servico nao encontrado: ' . $request->input('servico'));
+        return response()->json([
+            'success' => false,
+            'message' => 'Servico nao encontrado',
+        ], 404);
+    }
+
     $dadosFormatados = [
-        'profissional_id' => Profissional::where('nome', 'like', $request->input('profissional'))->first()->id,
-        'cliente_id' => Cliente::where('nome', 'like', $request->input('cliente'))->first()->id,
-        'servico_id' => Servico::where('nome', 'like', $request->input('servico'))->first()->id,
+        'profissional_id' => $profissional->id,
+        'cliente_id' => $cliente->id,
+        'servico_id' => $servico->id,
         'data' => $dataInicio,
         'horario' => $horario,
         'status' => 'confirmado',
     ];
+
+    //nao permitir agendamento duplicado
+    $agendamentoExistente = Agendamento::where('profissional_id', $profissional->id)
+        ->where('data', $dataInicio)
+        ->where('horario', $horario)
+        ->first();
+    if( $agendamentoExistente ) {
+        Log::error('Agendamento duplicado para o profissional: ' . $profissional->nome . ' na data: ' . $dataInicio . ' horario: ' . $horario);
+        return response()->json([
+            'success' => false,
+            'message' => 'Agendamento duplicado para o profissional na data e horario informados',
+        ], 409);
+    }
+    
     $agendamento = Agendamento::create($dadosFormatados);
     return response()->json([
         'success' => true,

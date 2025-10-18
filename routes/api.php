@@ -14,7 +14,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/agendas', function (Request $request) {
     if ($request['data']) {
     // Converte a string da URL para Carbon
-    $data = Carbon::parse($data)->format('Y-m-d');
+    $data = Carbon::parse($request['data'])->format('Y-m-d');
 
     // JSON com agendas dos profissionais
     $profissionais = Profissional::with('agenda')->get();

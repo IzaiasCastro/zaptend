@@ -67,6 +67,20 @@ Route::get('/agendas', function (Request $request) {
                 'domingo' => $agenda->domingo ? 'disponivel' : 'nao disponivel'];
         }
 
+        $diaIngles = Carbon::now()->format('l');
+
+        $diasSemana = [
+            'Monday'    => 'segunda',
+            'Tuesday'   => 'terca',
+            'Wednesday' => 'quarta',
+            'Thursday'  => 'quinta',
+            'Friday'    => 'sexta',
+            'Saturday'  => 'sabado',
+            'Sunday'    => 'domingo',
+        ];
+
+        $diaPortugues = $diasSemana[$diaIngles] ?? $diaIngles;
+
         return [
             'profissional' => $profissional->nome,
             'disponivel' => $disponivel,
@@ -77,7 +91,7 @@ Route::get('/agendas', function (Request $request) {
             'fim_almoco' => $disponivel ? $agenda->fim_almoco : null,
             'tempo_medio' => $disponivel ? $agenda->tempo_medio : null,
             'dias_de_trabalho' => $dias_de_trabalho,
-            'dia_da_semana_atual' => Carbon::now()->format('l')
+            'dia_da_semana_atual' => $diaPortugues,
         ];
     });
 

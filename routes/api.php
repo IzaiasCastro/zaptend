@@ -101,6 +101,7 @@ Route::get('/agendas', function (Request $request) {
 
         return [
             'profissional' => $profissional->nome,
+            'whatsapp' => $profissional->telefone,
             'disponivel' => $disponivel,
             'status' => $agenda->status ?? false, // status da agenda
             'inicio_expediente' => $disponivel ? $agenda->inicio_expediente : null,
@@ -111,6 +112,7 @@ Route::get('/agendas', function (Request $request) {
             'dias_de_trabalho' => $dias_de_trabalho,
             'dia_da_semana_atual' => $diaPortugues,
             'referencia_semanal' => $referencia_semanal,
+            'nome_estabelecimento' => ''
         ];
     });
 

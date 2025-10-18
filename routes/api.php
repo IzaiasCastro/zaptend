@@ -55,6 +55,18 @@ Route::get('/agendas', function (Request $request) {
         // Se não houver agenda ou status for falso, profissional não está disponível
         $disponivel = $agenda && $agenda->status;
 
+        $dias_da_semana = [];
+
+        if( $disponivel && $agenda ) {
+            $dias_da_semana = ['segunda' => $agenda->segunda ? 'disponivel' : 'nao disponivel',
+                'terca' => $agenda->terca ? 'disponivel' : 'nao disponivel',
+                'quarta' => $agenda->quarta ? 'disponivel' : 'nao disponivel',
+                'quinta' => $agenda->quinta ? 'disponivel' : 'nao disponivel',
+                'sexta' => $agenda->sexta ? 'disponivel' : 'nao disponivel',
+                'sabado' => $agenda->sabado ? 'disponivel' : 'nao disponivel',
+                'domingo' => $agenda->domingo ? 'disponivel' : 'nao disponivel'];
+        }
+
         return [
             'profissional' => $profissional->nome,
             'disponivel' => $disponivel,
@@ -64,15 +76,7 @@ Route::get('/agendas', function (Request $request) {
             'inicio_almoco' => $disponivel ? $agenda->inicio_almoco : null,
             'fim_almoco' => $disponivel ? $agenda->fim_almoco : null,
             'tempo_medio' => $disponivel ? $agenda->tempo_medio : null,
-            'dias_da_semana' => [
-                'segunda' => $agenda->segunda ? 'disponivel' : 'nao disponivel',
-                'terca' => $agenda->terca ? 'disponivel' : 'nao disponivel',
-                'quarta' => $agenda->quarta ? 'disponivel' : 'nao disponivel',
-                'quinta' => $agenda->quinta ? 'disponivel' : 'nao disponivel',
-                'sexta' => $agenda->sexta ? 'disponivel' : 'nao disponivel',
-                'sabado' => $agenda->sabado ? 'disponivel' : 'nao disponivel',
-                'domingo' => $agenda->domingo ? 'disponivel' : 'nao disponivel',
-            ]
+            'dias_da_semana' => $dias_da_semana
         ];
     });
 

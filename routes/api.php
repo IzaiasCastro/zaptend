@@ -86,7 +86,7 @@ Route::get('/agendas', function (Request $request) {
         $hoje = Carbon::now();
         $referencia_semanal = [
             'data_hoje' => $hoje->format('Y-m-d'),
-            'dia_semana_hoje' => $hoje->translatedFormat('l'),
+            'dia_semana_hoje' => $diaPortugues,
             'amanha' => $hoje->copy()->addDay()->format('Y-m-d'),
             'segunda' => $hoje->copy()->next(Carbon::MONDAY)->format('Y-m-d'),
             'terca' => $hoje->copy()->next(Carbon::TUESDAY)->format('Y-m-d'),

@@ -10,17 +10,6 @@ class Agendamento extends Model
 {
     protected $guarded = [];
 
-    protected $casts = [
-        'data' => 'date:Y-m-d',
-    ];
-
-       protected function data(): Attribute
-    {
-        return Attribute::make(
-            set: fn ($value) => Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d')
-        );
-    }
-
     public function profissional()
     {
         return $this->belongsTo(Profissional::class);

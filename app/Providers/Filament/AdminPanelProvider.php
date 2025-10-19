@@ -10,6 +10,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Console\Scheduling\Event;
@@ -26,6 +27,9 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->brandName('Atende+')
+            ->brandLogo(asset('images/logo-atende.png'))
+            ->brandLogoHeight('6rem')
             ->default()
             ->id('admin')
             ->path('admin')
@@ -40,8 +44,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -58,4 +60,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+    
 }

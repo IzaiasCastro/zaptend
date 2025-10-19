@@ -2,12 +2,18 @@
 
 namespace App\Filament\Resources\Agendamentos\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
+use Filament\Actions\DeleteBulkAction as ActionsDeleteBulkAction;
+use Filament\Actions\EditAction as ActionsEditAction;
+use Filament\Actions\ViewAction as ActionsViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class AgendamentosTable
 {
@@ -15,63 +21,107 @@ class AgendamentosTable
     {
         return $table
             ->columns([
+                // 🗓️ Data e horário
                 TextColumn::make('data')
-                    ->date()
-                    ->sortable(),
+                    ->label('Data')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->icon('heroicon-o-calendar'),
+                    
                 TextColumn::make('horario')
-                    ->time()
-                    ->sortable(),
-                TextColumn::make('nome')
-                    ->searchable(),
-                TextColumn::make('telefone')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('servico')
-                    ->searchable(),
-                TextColumn::make('observacao')
-                    ->searchable(),
-                TextColumn::make('profissional_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('servico_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('agenda_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->badge(),
-                TextColumn::make('pagamento')
-                    ->badge(),
+                    ->label('Hora')
+                    ->time('H:i')
+                    ->sortable()
+                    ->icon('heroicon-o-clock'),
+
+                // 👤 Cliente
+                TextColumn::make('cliente.nome')
+                ->label('Cliente')
+                ->sortable()
+                ->searchable(),
+
+
+                // ✂️ Serviço e profissional
+                TextColumn::make('servico.nome')
+                ->label('Serviço')
+                ->sortable()
+                ->searchable(),
+
+                TextColumn::make('profissional.nome')
+                    ->label('Profissional')
+                    ->icon('heroicon-o-user-circle')
+                    ->toggleable(),
+
+                // 💰 Valor e pagamento
                 TextColumn::make('valor')
-                    ->numeric()
+                    ->label('Valor')
+                    ->money('BRL', true)
+                    ->alignEnd()
                     ->sortable(),
-                TextColumn::make('metodo_pagamento')
-                    ->searchable(),
-                TextColumn::make('cliente_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
+
+                // TextColumn::make('pagamento')
+                //     ->badge()
+                //     ->label('Pagamento')
+                //     ->color(fn (string $state): string => match (strtolower($state)) {
+                //         'pago', 'confirmado' => 'success',
+                //         'pendente' => 'warning',
+                //         'cancelado', 'falhou' => 'danger',
+                //         default => 'gray',
+                //     }),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->label('Status')
+                    ->color(fn (string $state): string => match (strtolower($state)) {
+                        'pendente' => 'warning',
+                        'confirmado' => 'success',
+                        'cancelado' => 'danger',
+                        default => 'gray',
+                    }),
             ])
+
+            ->defaultSort('data', 'desc')
+
             ->filters([
-                //
+                // Exemplo: filtro rápido
+                // SelectFilter::make('status')->options([
+                //     'pendente' => 'Pendente',
+                //     'confirmado' => 'Confirmado',
+                //     'cancelado' => 'Cancelado',
+                // ]),
             ])
+
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                // ActionsViewAction::make()->icon('heroicon-o-eye'),
+                ActionsEditAction::make()->icon('heroicon-o-pencil-square'),
+
+
+   Action::make('mudar_status')
+    ->label('Mudar Status')
+    ->form([
+        Select::make('status')
+            ->label('Novo Status')
+            ->options([
+                'pendente' => 'Pendente',
+                'confirmado' => 'Confirmado',
+                'cancelado' => 'Cancelado',
+                'ausente' => 'Ausente',
+                'finalizado' => 'Finalizado',
             ])
+            ->required(),
+    ])
+    ->action(function ($record, array $data) {
+        $record->status = $data['status'];
+        $record->save();
+    }),
+            ])
+
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                ActionsBulkActionGroup::make([
+                    ActionsDeleteBulkAction::make()
+                        ->label('Excluir selecionados')
+                        ->icon('heroicon-o-trash'),
                 ]),
             ]);
     }

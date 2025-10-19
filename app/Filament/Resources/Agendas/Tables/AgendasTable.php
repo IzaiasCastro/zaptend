@@ -15,9 +15,10 @@ class AgendasTable
     {
         return $table
             ->columns([
-                TextColumn::make('profissional_id')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('profissional.nome')
+                    ->label('Profissional')
+                    ->icon('heroicon-o-user-circle')
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

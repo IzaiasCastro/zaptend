@@ -11,4 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 class Agenda extends Model
 {
     protected $guarded = [];
+
+    public function profissional()
+    {
+        return $this->belongsTo(Profissional::class);
+    }
 }

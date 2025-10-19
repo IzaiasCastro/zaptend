@@ -47,8 +47,8 @@ class AgendamentoForm
                         ->searchable()
                         ->required(),
 
-                    TextInput::make('telefone')
-                        ->label('Telefone')
+                    TextInput::make('cliente.telefone')
+                        ->label('Whatsapp')
                         ->tel()
                         // ->mask(fn ($mask) => $mask->pattern('(00) 00000-0000'))
                         ->required(),
@@ -87,9 +87,10 @@ class AgendamentoForm
                     Select::make('status')
                         ->label('Status do Agendamento')
                         ->options([
-                            'pendente' => 'Pendente',
                             'confirmado' => 'Confirmado',
                             'cancelado' => 'Cancelado',
+                            'ausente' => 'Ausente',
+                            'finalizado' => 'Finalizado',
                         ])
                         ->default('pendente')
                         ->required(),

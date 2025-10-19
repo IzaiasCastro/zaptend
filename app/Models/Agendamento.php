@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Agendamento extends Model
@@ -11,6 +13,13 @@ class Agendamento extends Model
     protected $casts = [
         'data' => 'date:Y-m-d',
     ];
+
+       protected function data(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d')
+        );
+    }
 
     public function profissional()
     {

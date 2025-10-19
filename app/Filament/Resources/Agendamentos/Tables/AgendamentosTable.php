@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Agendamentos\Tables;
 
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup as ActionsBulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction as ActionsDeleteBulkAction;
 use Filament\Actions\EditAction as ActionsEditAction;
 use Filament\Actions\ViewAction as ActionsViewAction;
@@ -93,28 +94,27 @@ class AgendamentosTable
             ])
 
             ->recordActions([
+                DeleteAction::make(), //
                 // ActionsViewAction::make()->icon('heroicon-o-eye'),
                 ActionsEditAction::make()->icon('heroicon-o-pencil-square'),
-
-
-   Action::make('mudar_status')
-    ->label('Mudar Status')
-    ->form([
-        Select::make('status')
-            ->label('Novo Status')
-            ->options([
-                'pendente' => 'Pendente',
-                'confirmado' => 'Confirmado',
-                'cancelado' => 'Cancelado',
-                'ausente' => 'Ausente',
-                'finalizado' => 'Finalizado',
-            ])
-            ->required(),
-    ])
-    ->action(function ($record, array $data) {
-        $record->status = $data['status'];
-        $record->save();
-    }),
+                    Action::make('mudar_status')
+                        ->label('Mudar Status')
+                        ->form([
+                            Select::make('status')
+                                ->label('Novo Status')
+                                ->options([
+                                    'pendente' => 'Pendente',
+                                    'confirmado' => 'Confirmado',
+                                    'cancelado' => 'Cancelado',
+                                    'ausente' => 'Ausente',
+                                    'finalizado' => 'Finalizado',
+                                ])
+                                ->required(),
+                        ])
+                        ->action(function ($record, array $data) {
+                            $record->status = $data['status'];
+                            $record->save();
+                        }),
             ])
 
             ->toolbarActions([

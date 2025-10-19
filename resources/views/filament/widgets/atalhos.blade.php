@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section>
-        <div class="space-y-1">
-            <ul class="flex flex-col gap-1">
+        <div class="space-y-10">
+            <ul class="flex flex-col gap-15">
                 <li>
                     <x-filament::link 
                         :href="'/admin/agendamentos'" 

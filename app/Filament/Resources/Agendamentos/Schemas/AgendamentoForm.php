@@ -47,16 +47,9 @@ class AgendamentoForm
                         ->searchable()
                         ->required(),
 
-                    TextInput::make('cliente.telefone')
-                        ->label('Whatsapp')
-                        ->tel()
-                        // ->mask(fn ($mask) => $mask->pattern('(00) 00000-0000'))
-                        ->required(),
+                    
 
-                    TextInput::make('email')
-                        ->label('E-mail')
-                        ->email()
-                        ->required(),
+                   
                 ]),
 
             // Seção: Profissional e Serviço
@@ -74,11 +67,7 @@ class AgendamentoForm
                         ->searchable()
                         ->required(),
 
-                    TextInput::make('valor')
-                        ->label('Valor')
-                        ->numeric()
-                        ->required()
-                        ->helperText('Informe o valor do serviço em R$.'),
+                    
                 ]),
 
             // Seção: Pagamento e Status

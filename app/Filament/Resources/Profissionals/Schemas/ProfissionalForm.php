@@ -26,16 +26,12 @@ class ProfissionalForm
             Section::make('Contato WhatsApp')
                 ->schema([
                     TextInput::make('telefone')
-                        ->label('Telefone')
+                        ->label('Whatsapp')
                         ->placeholder('(99) 99999-9999')
                         ->tel()
                         // ->mask(fn ($mask) => $mask->pattern('(00) 00000-0000'))
                         ->required(),
 
-                    TextInput::make('email')
-                        ->label('E-mail')
-                        ->placeholder('exemplo@dominio.com')
-                        ->email(),
                 ]),
 
             // Seção: Endereço

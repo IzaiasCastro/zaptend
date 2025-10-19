@@ -46,11 +46,21 @@ class AgendamentoResource extends Resource
         ];
     }
 
+    public static function canDelete($record): bool
+    {
+        return true;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false; // ❌ remove o botão "Criar"
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListAgendamentos::route('/'),
-            'create' => CreateAgendamento::route('/create'),
+            // 'create' => CreateAgendamento::route('/create'),
             'view' => ViewAgendamento::route('/{record}'),
             'edit' => EditAgendamento::route('/{record}/edit'),
         ];

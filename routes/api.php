@@ -150,14 +150,26 @@ Route::get('/agendas', function (Request $request) {
 });
 
 Route::post('/agendamento', function (Request $request) {
-    //remover hora e criar somente a data
-    $dataInicio = Carbon::parse($request->input('data_inicio'))->format('Y-m-d');
+    // Converter data_inicio DD/MM/YYYY H:i:s para MySQL
+    try {
+        $dataObj = Carbon::createFromFormat('d/m/Y H:i:s', $request->input('data_inicio'));
+    } catch (\Exception $e) {
+        Log::error('Formato de data inválido: ' . $request->input('data_inicio'));
+        return response()->json([
+            'success' => false,
+            'message' => 'Formato de data inválido, use DD/MM/YYYY HH:MM:SS'
+        ], 422);
+    }
 
-    //remover data e criar somente a hora
-    $horario = Carbon::parse($request->input('data_inicio'))->format('H:i');
+    // Remover hora e criar somente a data
+    $dataInicio = $dataObj->format('Y-m-d');
 
+    // Remover data e criar somente a hora
+    $horario = $dataObj->format('H:i');
+
+    // Profissional
     $profissional = Profissional::where('nome', 'like', $request->input('profissional'))->first();
-    if( !$profissional ) {
+    if (!$profissional) {
         Log::error('Profissional não encontrado: ' . $request->input('profissional'));
         return response()->json([
             'success' => false,
@@ -165,9 +177,9 @@ Route::post('/agendamento', function (Request $request) {
         ], 404);
     }
 
-    //cliente
+    // Cliente
     $cliente = Cliente::where('nome', 'like', $request->input('cliente'))->first();
-    if( !$cliente ) {
+    if (!$cliente) {
         Log::error('Cliente nao encontrado: ' . $request->input('cliente'));
         return response()->json([
             'success' => false,
@@ -175,9 +187,9 @@ Route::post('/agendamento', function (Request $request) {
         ], 404);
     }
 
-    //servico
+    // Servico
     $servico = Servico::where('nome', 'like', $request->input('servico'))->first();
-    if( !$servico ) {
+    if (!$servico) {
         Log::error('Servico nao encontrado: ' . $request->input('servico'));
         return response()->json([
             'success' => false,
@@ -194,22 +206,18 @@ Route::post('/agendamento', function (Request $request) {
         'status' => 'confirmado',
     ];
 
-    //nao permitir agendamento duplicado
+    // Não permitir agendamento duplicado
     $agendamentoExistente = Agendamento::where('profissional_id', $profissional->id)
         ->where('data', $dataInicio)
         ->where('horario', $horario)
         ->first();
-    if( $agendamentoExistente ) {
+    if ($agendamentoExistente) {
         Log::error('Agendamento duplicado para o profissional: ' . $profissional->nome . ' na data: ' . $dataInicio . ' horario: ' . $horario);
         return response()->json([
             'success' => false,
             'message' => 'Agendamento duplicado para o profissional na data e horario informados',
         ], 409);
     }
-    
-     // Converte DD/MM/YYYY HH:MM:SS → YYYY-MM-DD HH:MM:SS
-    $dadosFormatados['data_inicio'] = Carbon::createFromFormat('d/m/Y H:i:s', $dadosFormatados['data_inicio'])
-                                    ->format('Y-m-d H:i:s');
 
     $agendamento = Agendamento::create($dadosFormatados);
     return response()->json([

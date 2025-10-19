@@ -207,6 +207,8 @@ Route::post('/agendamento', function (Request $request) {
         ], 409);
     }
     
+    $dadosFormatados['data'] = Carbon::createFromFormat('d/m/Y', $dadosFormatados['data'])->format('Y-m-d');
+
     $agendamento = Agendamento::create($dadosFormatados);
     return response()->json([
         'success' => true,

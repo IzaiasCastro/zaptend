@@ -207,9 +207,9 @@ Route::post('/agendamento', function (Request $request) {
         ], 409);
     }
     
-    // Converte DD/MM/YYYY → YYYY-MM-DD
-    $dados['data'] = Carbon::createFromFormat('d/m/Y', $dadosFormatados['data'])
-                                        ->format('Y-m-d');
+     // Converte DD/MM/YYYY HH:MM:SS → YYYY-MM-DD HH:MM:SS
+    $dadosFormatados['data_inicio'] = Carbon::createFromFormat('d/m/Y H:i:s', $dadosFormatados['data_inicio'])
+                                    ->format('Y-m-d H:i:s');
 
     $agendamento = Agendamento::create($dadosFormatados);
     return response()->json([

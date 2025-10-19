@@ -8,6 +8,10 @@ class Agendamento extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'data' => 'date:Y-m-d',
+    ];
+
     public function profissional()
     {
         return $this->belongsTo(Profissional::class);
